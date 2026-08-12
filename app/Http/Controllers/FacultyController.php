@@ -21,7 +21,7 @@ class FacultyController extends Controller
      */
     public function create()
     {
-        //
+        return view('faculties.create');
     }
 
     /**
@@ -29,7 +29,15 @@ class FacultyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'code'=>'required|string|unique:faculties,code',
+            'name'=>'required|string',
+            'color'=>'nullable|string'
+        ]);
+
+        Faculty::create($request->only(['code','name','color']));
+
+        return redirect()->route('faculties.index');
     }
 
     /**
@@ -43,24 +51,33 @@ class FacultyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Faculty $faculty)
     {
-        //
+        return view('faculties.edit', compact('faculty'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Faculty $faculty)
     {
-        //
+        $request->validate([
+            'code'=>'required|string|unique:faculties,code,' . $faculty->id,
+            'name'=>'required|string',
+            'color'=>'nullable|string'
+        ]);
+
+        $faculty->update($request->only(['code','name','color']));
+
+        return redirect()->route('faculties.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Faculty $faculty)
     {
-        //
+        $faculty->delete();
+        return redirect()->route('faculties.index')->with('success','Fakultas berhasil di update');
     }
 }
