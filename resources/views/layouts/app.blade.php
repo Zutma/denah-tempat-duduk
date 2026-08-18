@@ -43,7 +43,7 @@
                 </a>
 
                 <!-- Wisuda (Menggunakan request()->is() karena panggil URL mentah /wisuda) -->
-                <a href="/wisuda"
+                <a href="{{ route('graduation-events.index') }}"
                     class="flex items-center px-4 py-3 text-sm rounded-lg transition-colors {{ request()->is('wisuda*') ? 'font-semibold text-white bg-sky-500 shadow-md' : 'text-slate-300 hover:bg-slate-800' }}">
                     <span class="mr-3">🏛️</span> Wisuda
                 </a>

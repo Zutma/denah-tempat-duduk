@@ -32,7 +32,8 @@
                 </div>
 
                 <div>
-                    <label for="degree_level" class="block text-sm font-medium text-gray-700 mb-1">Jenjang (S1/S2/S3/D4)</label>
+                    <label for="degree_level" class="block text-sm font-medium text-gray-700 mb-1">Jenjang
+                        (S1/S2/S3/D4)</label>
                     <input type="text" id="degree_level" name="degree_level"
                         value="{{ old('degree_level', $studyProgram->degree_level) }}" placeholder="Contoh: S1"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 uppercase">
@@ -42,8 +43,8 @@
             <!-- Input Nama Prodi -->
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Prodi</label>
-                <input type="text" id="name" name="name"
-                    value="{{ old('name', $studyProgram->name) }}" placeholder="Masukkan Nama Program Studi"
+                <input type="text" id="name" name="name" value="{{ old('name', $studyProgram->name) }}"
+                    placeholder="Masukkan Nama Program Studi"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
             </div>
 

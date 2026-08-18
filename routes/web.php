@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\GraduationEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudyProgram;
 use App\Http\Controllers\StudyProgramController;
@@ -25,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/faculties', FacultyController::class);
     Route::resource('/study-programs', StudyProgramController::class);
+    Route::resource('/graduation-events', GraduationEventController::class);
 
 });
 
