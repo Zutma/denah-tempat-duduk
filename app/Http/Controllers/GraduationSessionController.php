@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\GraduationEvent;
+use App\Models\GraduationSession;
 use Illuminate\Http\Request;
 
-class GraduateSessionController extends Controller
+class GraduationSessionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -77,7 +78,7 @@ class GraduateSessionController extends Controller
      */
     public function destroy(GraduationSession $session)
     {
-        $eventId = $session->graduation_events_id;
+        $eventId = $session->graduation_event_id;
         $session->delete();
         return redirect()->route('graduation-events.sessions.index', $eventId);
     }

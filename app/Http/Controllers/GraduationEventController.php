@@ -73,6 +73,11 @@ class GraduationEventController extends Controller
      */
     public function destroy(GraduationEvent $graduationEvent)
     {
+        if ($graduationEvent->sessions()->exists()) {
+            return redirect()->route('graduation-events.index')
+                ->with('error', 'Tidak bisa menghapus event yang masih memiliki sesi. Hapus sesinya terlebih dahulu.');
+        }
+
         $graduationEvent->delete();
         return redirect()->route('graduation-events.index');
     }
