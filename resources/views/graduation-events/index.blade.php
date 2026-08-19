@@ -27,7 +27,7 @@
                 @foreach ($events as $event)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 font-semibold text-gray-800">
-                            <a href="#" class="hover:text-sky-600 transition-colors">{{ $event->name }}</a>
+                            <a href="{{ route('graduation-events.sessions.index', $event) }}" class="hover:text-sky-600 transition-colors">{{ $event->name }}</a>
                         </td>
                         <td class="px-6 py-4 text-right space-x-3">
                             <a href="{{ route('graduation-events.edit', $event) }}"
