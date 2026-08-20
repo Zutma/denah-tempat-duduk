@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-xl font-bold text-gray-800">Daftar Event Wisuda</h1>
+        <h1 class="text-xl font-bold text-gray-800">Wisuda</h1>
         <a href="{{ route('graduation-events.create') }}"
             class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
             + Tambah Event
@@ -15,33 +15,41 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm text-left text-gray-900">
-            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-semibold text-xs">
-                <tr>
-                    <th class="px-6 py-3 text-left">Nama Event</th>
-                    <th class="px-6 py-3 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @foreach ($events as $event)
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-semibold text-gray-800">
-                            <a href="#" class="hover:text-sky-600 transition-colors">{{ $event->name }}</a>
-                        </td>
-                        <td class="px-6 py-4 text-right space-x-3">
-                            <a href="{{ route('graduation-events.edit', $event) }}"
-                                class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                            <form method="POST" action="{{ route('graduation-events.destroy', $event) }}" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Yakin hapus?')"
-                                    class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+    @if (session('error'))
+        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @forelse ($events as $event)
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                <a href="{{ route('graduation-events.sessions.index', $event) }}" class="block">
+                    <div class="flex items-center gap-3 mb-1">
+                        <span class="text-2xl">🏛️</span>
+                        <h3 class="font-semibold text-gray-900">{{ $event->name }}</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 ml-11">{{ $event->sessions->count() }} sesi</p>
+                </a>
+                                <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-100">
+                    <a href="{{ route('graduation-events.edit', $event) }}"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                         Edit
+                    </a>
+                    <form method="POST" action="{{ route('graduation-events.destroy', $event) }}" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('Yakin hapus? Semua sesi & data di dalamnya ikut terhapus.')"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors">
+                             Hapus
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <div class="col-span-full text-center py-12 text-gray-400">
+                Belum ada event wisuda. Klik "+ Tambah Event" untuk membuat yang pertama.
+            </div>
+        @endforelse
     </div>
 @endsection
