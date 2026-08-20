@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('seat_row_id')->constrained('seat_rows');
+            $table->foreignId('seat_row_id')->constrained('seat_rows')->onDelete('cascade');
             $table->tinyInteger('position');
             $table->tinyInteger('number');
             $table->string('category');

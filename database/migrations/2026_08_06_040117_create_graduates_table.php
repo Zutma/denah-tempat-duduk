@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('study_program_id')->constrained('study_programs');
             $table->string('nrp');
             $table->string('name');
-            $table->foreignId('seat_id')->constrained('seats');
+            $table->foreignId('seat_id')->nullable()->constrained('seats')->onDelete('set null');
             $table->timestamps();
         });
     }

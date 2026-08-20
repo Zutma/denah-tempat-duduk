@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('graduation_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('graduation_event_id')->constrained('graduation_events');
+            $table->foreignId('graduation_event_id')->constrained('graduation_events')->onDelete('cascade');
             $table->date('date');
             $table->tinyInteger('session')->nullable();
             $table->enum('status',['draft','published','archived']);

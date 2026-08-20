@@ -40,12 +40,13 @@
                                     'archived' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                                 ][$session->status];
                             @endphp
-                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border capitalize {{ $badge }}">
+                            <span
+                                class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border capitalize {{ $badge }}">
                                 {{ $session->status }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">
-                            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">🪑 Kursi</a>
+                            <a href="{{ route('sessions.seats.index', $session) }}" class="text-gray-600 hover:text-gray-900 font-medium">🪑 Kursi</a>
                             <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">🎓 Wisudawan</a>
                             <a href="{{ route('sessions.edit', $session) }}"
                                 class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
