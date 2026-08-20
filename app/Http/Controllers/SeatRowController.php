@@ -40,9 +40,20 @@ class SeatRowController extends Controller
             'capacity'=>'required|integer|min:1|max:100'
         ]);
 
+        $row = strtoupper($request->row);
+
+        $exists = SeatRow::where('graduation_session_id', $session->id)
+        ->where('row', $row)
+        ->where('side', $request->side)
+        ->exists();
+
+        if ($exists) {
+        return back()->withErrors(['row' => "Baris {$row} sisi {$request->side} sudah ada untuk sesi ini."])->withInput();
+         }
+
         $seatRow = SeatRow::create([
             'graduation_session_id'=>$session->id,
-            'row'=>$request->row,
+            'row'=>$row,
             'side'=>$request->side,
             'index'=> 0,
             'capacity'=>$request->capacity,
