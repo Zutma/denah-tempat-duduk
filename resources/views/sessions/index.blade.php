@@ -20,7 +20,7 @@
         <td>{{ $session->session ?? '-' }}</td>
         <td>{{ $session->status }}</td>
         <td>
-            <a href="#">Kelola Kursi</a> |
+            <a href="{{ route('sessions.seats.index', $session) }}">Kelola Kursi</a> |
             <a href="#">Data Wisudawan</a> |
             <a href="{{ route('sessions.edit', $session) }}">Edit</a>
             <form method="POST" action="{{ route('sessions.destroy', $session) }}" style="display:inline">

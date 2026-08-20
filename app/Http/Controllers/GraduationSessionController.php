@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GraduationEvent;
 use Illuminate\Http\Request;
 
-class GraduateSessionController extends Controller
+class GraduationSessionController extends Controller
 {
     /**
      * Display a listing of the resource.
