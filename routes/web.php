@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\GraduateController;
 use App\Http\Controllers\GraduationEventController;
 use App\Http\Controllers\GraduationSessionController;
 use App\Http\Controllers\ProfileController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\StudyProgram;
 use App\Http\Controllers\StudyProgramController;
 use App\Models\Faculty;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -35,6 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/graduation-sessions/{session}/seats', [SeatRowController::class, 'index'])->name('sessions.seats.index');
     Route::post('/graduation-sessions/{session}/seats', [SeatRowController::class, 'store'])->name('sessions.seats.store');
     Route::delete('/seat-rows/{seatRow}', [SeatRowController::class, 'destroy'])->name('seat-rows.destroy');
+    Route::get('/graduation-sessions/{session}/graduates',[GraduateController::class,'index'])->name('sessions.graduates.index');
+    Route::get('/graduation-sessions/{session}/graduates/create',[GraduateController::class,'create'])->name('sessions.graduates.create');
+    Route::post('/graduation-sessions/{session}/graduates',[GraduateController::class,'store'])->name('sessions.graduates.store');
+    Route::delete('/graduates/{graduate}', [GraduateController::class, 'destroy'])->name('graduates.destroy');
 });
 
 require __DIR__.'/auth.php';
