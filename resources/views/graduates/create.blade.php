@@ -25,6 +25,17 @@
         @endforeach
     </select><br><br>
 
+    <label>Kursi (opsional):</label><br>
+    <select name="seat_id">
+        <option value="">-- Belum Ditentukan --</option>
+        @foreach ($seats as $seat)
+            <option value="{{ $seat->id }}">
+                Baris {{ $seat->seatRow->row }} {{ $seat->seatRow->side == 'left' ? 'Kiri' : 'Kanan' }} — No.
+                {{ $seat->number }}
+            </option>
+        @endforeach
+    </select><br><br>
+
     <button type="submit">Simpan</button>
 </form>
 

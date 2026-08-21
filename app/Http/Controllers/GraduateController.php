@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Faculty;
 use App\Models\Graduate;
 use App\Models\GraduationSession;
+use App\Models\Seat;
 use App\Models\StudyProgram;
 use Illuminate\Http\Request;
 
@@ -30,7 +31,14 @@ class GraduateController extends Controller
         $faculties = Faculty::all();
         $studyPrograms = StudyProgram::all();
 
-        return view('graduates.create',compact('session','faculties','studyPrograms'));
+        $seats = Seat::whereHas('seatRow', function ($query) use ($session) {
+            $query->where('graduation_session_id', $session->id);
+        })
+        ->whereDoesntHave('graduate')
+        ->with('seatRow')
+        ->get();
+
+        return view('graduates.create',compact('session','faculties','studyPrograms','seats'));
     }
 
     /**
@@ -43,6 +51,7 @@ class GraduateController extends Controller
             'name' => 'required|string',
             'faculty_id' => 'required|exists:faculties,id',
             'study_program_id' => 'required|exists:study_programs,id',
+            'seat_id' => 'nullable|exists:seats,id',
         ]);
 
         Graduate::create([
@@ -51,6 +60,7 @@ class GraduateController extends Controller
             'study_program_id' => $request->study_program_id,
             'nrp' => $request->nrp,
             'name' => $request->name,
+            'seat_id'=> $request->seat_id,
         ]);
 
         return redirect()->route('sessions.graduates.index', $session);
