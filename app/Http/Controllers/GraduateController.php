@@ -16,6 +16,8 @@ class GraduateController extends Controller
      */
     public function index(GraduationSession $session)
     {
+        $session->load('event');
+
         $graduates = Graduate::where('graduation_session_id',   $session->id)
             ->with(['faculty','studyProgram','seat.seatRow'])
             ->get();

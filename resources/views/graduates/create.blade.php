@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Breadcrumb Navigasi -->
-    <nav class="text-sm text-gray-500 mb-3">
-        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600">Wisuda</a>
-        <span class="mx-1">/</span>
-        <a href="{{ route('graduation-events.sessions.index', $session->graduation_event_id ?? $session->graduationEvent) }}" class="hover:text-sky-600">
-            Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
+    <!-- Breadcrumb Standard (Wisuda / Nama Event / Wisudawan / Tambah) -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
+        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600 transition-colors">Wisuda</a>
+        <span class="text-gray-300">/</span>
+        <a href="{{ route('graduation-events.sessions.index', $session->graduation_event_id) }}" class="hover:text-sky-600 transition-colors">
+            {{ $session->event?->name ?? 'Detail Event' }}
         </a>
-        <span class="mx-1">/</span>
-        <a href="{{ route('sessions.graduates.index', $session) }}" class="hover:text-sky-600">Wisudawan</a>
-        <span class="mx-1">/</span>
-        <span class="text-gray-700 font-medium">Tambah</span>
+        <span class="text-gray-300">/</span>
+        <a href="{{ route('sessions.graduates.index', $session) }}" class="hover:text-sky-600 transition-colors">Data Wisudawan</a>
+        <span class="text-gray-300">/</span>
+        <span class="text-gray-800 font-semibold">Tambah</span>
     </nav>
 
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div class="max-w-2xl bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h1 class="text-xl font-bold text-gray-800 mb-6">
             Tambah Wisudawan — Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
         </h1>
@@ -35,19 +35,19 @@
             <div>
                 <label for="nrp" class="block text-sm font-medium text-gray-700 mb-1">NRP</label>
                 <input type="text" id="nrp" name="nrp" value="{{ old('nrp') }}" placeholder="Contoh: 5025211001"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all" required>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none" required>
             </div>
 
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
                 <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="Nama Wisudawan"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all" required>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none" required>
             </div>
 
             <div>
                 <label for="faculty_id" class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
                 <select id="faculty_id" name="faculty_id"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all" required>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none" required>
                     <option value="">-- Pilih Fakultas --</option>
                     @foreach ($faculties as $faculty)
                         <option value="{{ $faculty->id }}" {{ old('faculty_id') == $faculty->id ? 'selected' : '' }}>
@@ -60,7 +60,7 @@
             <div>
                 <label for="study_program_id" class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
                 <select id="study_program_id" name="study_program_id"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all" required>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none" required>
                     <option value="">-- Pilih Prodi --</option>
                     @foreach ($studyPrograms as $sp)
                         <option value="{{ $sp->id }}" {{ old('study_program_id') == $sp->id ? 'selected' : '' }}>
@@ -73,7 +73,7 @@
             <div>
                 <label for="seat_id" class="block text-sm font-medium text-gray-700 mb-1">Kursi (Opsional)</label>
                 <select id="seat_id" name="seat_id"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none">
                     <option value="">-- Belum Ditentukan --</option>
                     @foreach ($seats as $seat)
                         <option value="{{ $seat->id }}" {{ old('seat_id') == $seat->id ? 'selected' : '' }}>
@@ -89,7 +89,7 @@
                     Batal
                 </a>
                 <button type="submit"
-                    class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
+                    class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
                     Simpan
                 </button>
             </div>

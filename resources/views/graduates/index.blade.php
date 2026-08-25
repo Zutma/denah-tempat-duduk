@@ -1,37 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Breadcrumb Navigasi -->
-    <nav class="text-sm text-gray-500 mb-3">
-        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600">Wisuda</a>
-        <span class="mx-1">/</span>
-        <a href="{{ route('graduation-events.sessions.index', $session->graduation_event_id ?? $session->graduationEvent) }}" class="hover:text-sky-600">
-            Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
+    <!-- Breadcrumb Level 2 -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
+        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600 transition-colors">Wisuda</a>
+        <span class="text-gray-300">/</span>
+        <a href="{{ route('graduation-events.sessions.index', $session->graduation_event_id) }}" class="hover:text-sky-600 transition-colors">
+            {{ $session->event?->name ?? 'Detail Event' }}
         </a>
-        <span class="mx-1">/</span>
-        <span class="text-gray-700 font-medium">Data Wisudawan</span>
+        <span class="text-gray-300">/</span>
+        <span class="text-gray-800 font-semibold">Data Wisudawan</span>
     </nav>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <h1 class="text-xl font-bold text-gray-800">
-            Data Wisudawan — Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
-        </h1>
+        <div>
+            <h1 class="text-xl font-bold text-gray-800">
+                Data Wisudawan — Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5">Daftar peserta wisuda beserta alokasi tempat duduk.</p>
+        </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('sessions.graduates.create', $session) }}"
-                class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
+                class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
                 + Tambah Wisudawan
             </a>
         </div>
     </div>
 
-    <!-- Alert Success -->
     @if (session('success'))
         <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg border border-green-200">
             {{ session('success') }}
         </div>
     @endif
 
-    <!-- Alert Errors / Validasi Upload -->
     @if ($errors->any())
         <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
             <ul class="list-disc list-inside space-y-1">
@@ -42,25 +43,12 @@
         </div>
     @endif
 
-    <!-- Alert Import Failed Rows -->
-    @if (session('failed') && count(session('failed')) > 0)
-        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
-            <p class="font-semibold mb-1">Beberapa data gagal diimport:</p>
-            <ul class="list-disc list-inside space-y-1">
-                @foreach (session('failed') as $fail)
-                    <li>{{ $fail }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <!-- Card Form Import Excel -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
         <h3 class="text-sm font-semibold text-gray-800 mb-3">📥 Import Data Wisudawan (Excel)</h3>
         <form method="POST" action="{{ route('sessions.import.store', $session) }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             @csrf
             <input type="file" name="file" accept=".xlsx,.xls"
-                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 transition-all border border-gray-300 rounded-lg cursor-pointer" required>
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 border border-gray-300 rounded-lg cursor-pointer" required>
             <button type="submit"
                 class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors whitespace-nowrap">
                 Upload & Import
@@ -68,7 +56,6 @@
         </form>
     </div>
 
-    <!-- Tabel Data Wisudawan -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-gray-900">
@@ -114,8 +101,7 @@
                                 <form method="POST" action="{{ route('graduates.destroy', $graduate) }}" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Yakin hapus data wisudawan ini?')"
-                                        class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
+                                    <button type="submit" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
                                 </form>
                             </td>
                         </tr>
