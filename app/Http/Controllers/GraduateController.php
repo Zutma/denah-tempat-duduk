@@ -17,7 +17,7 @@ class GraduateController extends Controller
     public function index(GraduationSession $session)
     {
         $graduates = Graduate::where('graduation_session_id',   $session->id)
-            ->with(['faculty','studyProgram','seat'])
+            ->with(['faculty','studyProgram','seat.seatRow'])
             ->get();
 
         return view('graduates.index',compact('session','graduates'));
