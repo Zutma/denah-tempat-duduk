@@ -47,7 +47,7 @@
                         </td>
                         <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">
                             <a href="{{ route('sessions.seats.index', $session) }}" class="text-gray-600 hover:text-gray-900 font-medium">🪑 Kursi</a>
-                            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">🎓 Wisudawan</a>
+                            <a href="{{ route('sessions.graduates.index', $session) }}" class="text-gray-600 hover:text-gray-900 font-medium">🎓 Wisudawan</a>
                             <a href="{{ route('sessions.edit', $session) }}"
                                 class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
                             <form method="POST" action="{{ route('sessions.destroy', $session) }}" class="inline">

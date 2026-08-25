@@ -50,12 +50,7 @@
             </nav>
         </div>
 
-        <div class="p-4 border-t border-slate-800">
-            <a href="/import-excel"
-                class="w-full flex items-center justify-center px-4 py-2.5 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg text-sm font-medium transition-colors border border-blue-500/30">
-                <span class="mr-2">📥</span> Import Excel
-            </a>
-        </div>
+        
     </aside>
 
     <!-- MAIN CONTENT AREA -->
