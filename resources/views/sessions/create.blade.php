@@ -1,12 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    <nav class="text-sm text-gray-500 mb-3">
-        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600">Wisuda</a>
-        <span class="mx-1">/</span>
-        <a href="{{ route('graduation-events.sessions.index', $graduationEvent) }}" class="hover:text-sky-600">{{ $graduationEvent->name }}</a>
-        <span class="mx-1">/</span>
-        <span class="text-gray-700 font-medium">Tambah Sesi</span>
+    <!-- Breadcrumb Standard (Wisuda / Nama Event / Tambah Sesi) -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
+        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600 transition-colors">Wisuda</a>
+        <span class="text-gray-300">/</span>
+        <a href="{{ route('graduation-events.sessions.index', $graduationEvent) }}" class="hover:text-sky-600 transition-colors">
+            {{ $graduationEvent->name }}
+        </a>
+        <span class="text-gray-300">/</span>
+        <span class="text-gray-800 font-semibold">Tambah Sesi</span>
     </nav>
 
     <h1 class="text-xl font-bold text-gray-800 mb-6">Tambah Sesi — {{ $graduationEvent->name }}</h1>
@@ -18,7 +21,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
                 <input type="date" name="date" value="{{ old('date') }}"
-                    class="w-full border-gray-300 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+                    class="w-full border-gray-300 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500" required>
             </div>
 
             <div>
@@ -29,8 +32,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select name="status"
-                    class="w-full border-gray-300 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+                <select name="status" class="w-full border-gray-300 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
                     <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
                     <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published</option>
                     <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Archived</option>
@@ -51,7 +53,7 @@
                 <a href="{{ route('graduation-events.sessions.index', $graduationEvent) }}"
                     class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Batal</a>
                 <button type="submit"
-                    class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
+                    class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
                     Simpan
                 </button>
             </div>

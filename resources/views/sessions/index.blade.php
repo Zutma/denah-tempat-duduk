@@ -1,16 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-    <nav class="text-sm text-gray-500 mb-3">
-        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600">Wisuda</a>
-        <span class="mx-1">/</span>
-        <span class="text-gray-700 font-medium">{{ $graduationEvent->name }}</span>
+    <!-- Breadcrumb Level 1 -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
+        <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600 transition-colors">Wisuda</a>
+        <span class="text-gray-300">/</span>
+        <span class="text-gray-800 font-semibold">{{ $graduationEvent->name }}</span>
     </nav>
-
+    
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-xl font-bold text-gray-800">{{ $graduationEvent->name }}</h1>
+        <div>
+            <h1 class="text-xl font-bold text-gray-800">{{ $graduationEvent->name }}</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Kelola daftar pelaksanaan sesi untuk event ini.</p>
+        </div>
         <a href="{{ route('graduation-events.sessions.create', $graduationEvent) }}"
-            class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
+            class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
             + Tambah Sesi
         </a>
     </div>
@@ -40,21 +44,18 @@
                                     'archived' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                                 ][$session->status];
                             @endphp
-                            <span
-                                class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border capitalize {{ $badge }}">
+                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border capitalize {{ $badge }}">
                                 {{ $session->status }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">
                             <a href="{{ route('sessions.seats.index', $session) }}" class="text-gray-600 hover:text-gray-900 font-medium">🪑 Kursi</a>
-                            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">🎓 Wisudawan</a>
-                            <a href="{{ route('sessions.edit', $session) }}"
-                                class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                            <a href="{{ route('sessions.graduates.index', $session) }}" class="text-gray-600 hover:text-gray-900 font-medium">🎓 Wisudawan</a>
+                            <a href="{{ route('sessions.edit', $session) }}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
                             <form method="POST" action="{{ route('sessions.destroy', $session) }}" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" onclick="return confirm('Yakin hapus?')"
-                                    class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
+                                <button type="submit" onclick="return confirm('Yakin hapus?')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
                             </form>
                         </td>
                     </tr>

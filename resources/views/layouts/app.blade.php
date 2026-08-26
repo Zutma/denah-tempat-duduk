@@ -51,25 +51,28 @@
         </div>
 
         <div class="p-4 border-t border-slate-800">
-            <a href="/import-excel"
-                class="w-full flex items-center justify-center px-4 py-2.5 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg text-sm font-medium transition-colors border border-blue-500/30">
-                <span class="mr-2">📥</span> Import Excel
-            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="w-full flex items-center px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors">
+                    <span class="mr-3">🚪</span> Logout
+                </button>
+            </form>
         </div>
+
     </aside>
 
     <!-- MAIN CONTENT AREA -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <!-- TOP NAVBAR -->
-        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
-            <h2 class="font-semibold text-gray-800">Admin Panel</h2>
-            <div class="flex items-center space-x-6">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="text-sm text-red-600 font-medium">Logout</button>
-                </form>
+        {{-- <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+            <h2 class="text-2xl font-bold text-gray-800">@yield('page-title')</h2>
+            <div
+                class="flex items-center space-x-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="font-medium text-gray-700">Administrator</span>
             </div>
-        </header>
+        </header> --}}
 
         <!-- KONTEN HALAMAN AKAN DITAMPILKAN DI SINI -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-8">
