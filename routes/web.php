@@ -7,19 +7,13 @@ use App\Http\Controllers\GraduationSessionController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SeatRowController;
-use App\Http\Controllers\StudyProgram;
 use App\Http\Controllers\StudyProgramController;
+use App\Http\Controllers\PublicController;
 use App\Models\Faculty;
 use Illuminate\Support\Facades\Route;
 
-
-
-
-
-
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route Utama Publik yang manggil PublicController
+Route::get('/', [PublicController::class, 'index'])->name('public.home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
