@@ -20,7 +20,7 @@ class GraduateController extends Controller
 
         $graduates = Graduate::where('graduation_session_id',   $session->id)
             ->with(['faculty','studyProgram','seat.seatRow'])
-            ->get();
+            ->paginate(20);
 
         return view('graduates.index',compact('session','graduates'));
     }
@@ -97,8 +97,7 @@ class GraduateController extends Controller
      */
     public function destroy(Graduate $graduate)
     {
-        $sessionId = $graduate->graduation_session_id;
         $graduate->delete();
-        return redirect()->route('sessions.graduates.index', $sessionId);
+        return redirect()->back()->with('success', 'Data wisudawan berhasil dihapus.');
     }
 }

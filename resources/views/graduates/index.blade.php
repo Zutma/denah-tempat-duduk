@@ -5,7 +5,8 @@
     <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
         <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600 transition-colors">Wisuda</a>
         <span class="text-gray-300">/</span>
-        <a href="{{ route('graduation-events.sessions.index', $session->graduation_event_id) }}" class="hover:text-sky-600 transition-colors">
+        <a href="{{ route('graduation-events.sessions.index', $session->graduation_event_id) }}"
+            class="hover:text-sky-600 transition-colors">
             {{ $session->event?->name ?? 'Detail Event' }}
         </a>
         <span class="text-gray-300">/</span>
@@ -33,6 +34,21 @@
         </div>
     @endif
 
+    @if (session('failed'))
+        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+            @if (is_array(session('failed')) && count(session('failed')) > 0)
+                <p class="font-semibold mb-1">Beberapa data gagal di-import / kursi tidak cukup:</p>
+                <ul class="list-disc list-inside space-y-1 text-xs">
+                    @foreach (session('failed') as $fail)
+                        <li>{{ $fail }}</li>
+                    @endforeach
+                </ul>
+            @else
+                {{ session('failed') }}
+            @endif
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
             <ul class="list-disc list-inside space-y-1">
@@ -45,10 +61,12 @@
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
         <h3 class="text-sm font-semibold text-gray-800 mb-3">📥 Import Data Wisudawan (Excel)</h3>
-        <form method="POST" action="{{ route('sessions.import.store', $session) }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <form method="POST" action="{{ route('sessions.import.store', $session) }}" enctype="multipart/form-data"
+            class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             @csrf
             <input type="file" name="file" accept=".xlsx,.xls"
-                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 border border-gray-300 rounded-lg cursor-pointer" required>
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 border border-gray-300 rounded-lg cursor-pointer"
+                required>
             <button type="submit"
                 class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors whitespace-nowrap">
                 Upload & Import
@@ -80,28 +98,33 @@
                             <td class="px-6 py-4 font-medium text-gray-900">{{ $graduate->name }}</td>
                             <td class="px-6 py-4">{{ $graduate->faculty->name ?? '-' }}</td>
                             <td class="px-6 py-4 text-center">
-                                <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 border border-gray-200">
+                                <span
+                                    class="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 border border-gray-200">
                                     {{ $graduate->studyProgram->degree_level ?? '-' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">{{ $graduate->studyProgram->name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-center font-bold text-gray-800">{{ $graduate->seat->seatRow->row ?? '-' }}</td>
+                            <td class="px-6 py-4 text-center font-bold text-gray-800">
+                                {{ $graduate->seat?->seatRow?->row ?? '-' }}</td>
                             <td class="px-6 py-4 text-center">
-                                @if(optional($graduate->seat->seatRow)->side)
-                                    <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded {{ $graduate->seat->seatRow->side == 'left' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200' }}">
-                                        {{ $graduate->seat->seatRow->side == 'left' ? 'Kiri' : 'Kanan' }}
+                                @if ($graduate->seat?->seatRow?->side)
+                                    <span
+                                        class="inline-block px-2 py-0.5 text-xs font-semibold rounded {{ $graduate->seat->seatRow->side == 'left' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200' }}">
+                                        {{ $graduate->seat?->seatRow?->side == 'left' ? 'Kiri' : 'Kanan' }}
                                     </span>
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-center text-gray-600">{{ $graduate->seat->position ?? '-' }}</td>
-                            <td class="px-6 py-4 text-center font-semibold text-gray-700">{{ $graduate->seat->number ?? '-' }}</td>
+                            <td class="px-6 py-4 text-center text-gray-600">{{ $graduate->seat?->position ?? '-' }}</td>
+                            <td class="px-6 py-4 text-center font-semibold text-gray-700">
+                                {{ $graduate->seat?->number ?? '-' }}</td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <form method="POST" action="{{ route('graduates.destroy', $graduate) }}" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
+                                    <button type="submit" onclick="return confirm('Yakin hapus data wisudawan ini?')"
+                                        class="text-red-600 hover:text-red-800 font-medium">Hapus</button>
                                 </form>
                             </td>
                         </tr>
@@ -114,6 +137,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            {{ $graduates->links() }}
         </div>
     </div>
 @endsection

@@ -63,7 +63,7 @@ class FacultySeeder extends Seeder
 
         Faculty::create([
             'code' => 'SIMT',
-            'name' => 'Fakultas Sains dan Analitika Data',
+            'name' => 'Sekolah Interdisiplin Manajemen dan Teknologi',
             'color' => '#192841',
         ]);
 
