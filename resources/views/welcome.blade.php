@@ -51,7 +51,8 @@
             </div>
 
             <!-- AREA DENAH KURSI (SCROLLABLE) -->
-            <div class="w-full overflow-x-auto pb-12 cursor-grab active:cursor-grabbing">
+            <!-- 👇 ID denahContainer ditambahkan di sini 👇 -->
+            <div id="denahContainer" class="w-full overflow-x-auto pb-12 cursor-grab active:cursor-grabbing scroll-smooth">
                 <div class="flex flex-nowrap justify-center mx-auto min-w-max px-4 gap-6 md:gap-10">
                     
                     <!-- ================= SAYAP KIRI ================= -->
@@ -160,5 +161,15 @@
         @endif
 
     </div>
+
+    <!--Script untuk geser scroll otomatis ke tengah-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const container = document.getElementById('denahContainer');
+            if (container) {
+                container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+            }
+        });
+    </script>
 </body>
 </html>

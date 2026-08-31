@@ -11,12 +11,11 @@ class PublicController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Ambil sesi wisuda yang aktif (contoh ambil sesi pertama)
-        // Nanti lu bisa tambahin kolom status (aktif/tidak) di tabel graduation_sessions
-        $activeSession = GraduationSession::latest()->first();
+        // 1. Ambil Sesi Wisuda yang statusnya Published
+        $activeSession = GraduationSession::where('status', 'published')->latest()->first();
 
         if (!$activeSession) {
-            return view('welcome', ['message' => 'Belum ada jadwal wisuda.']);
+            return view('welcome', ['message' => 'Belum ada jadwal wisuda yang dipublikasikan.']);
         }
 
         // 2. Logika Pencarian (Jika ada input nama/nrp)
@@ -38,7 +37,6 @@ class PublicController extends Controller
         }
 
         // 3. Ambil data baris kursi untuk Sayap Kiri dan Sayap Kanan
-        // Load juga relasi seats dan graduate-nya sekaligus
         $leftRows = SeatRow::with(['seats.graduate.faculty'])
             ->where('graduation_session_id', $activeSession->id)
             ->where('side', 'left')
