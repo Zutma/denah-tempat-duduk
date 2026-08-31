@@ -4,8 +4,13 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-xl font-bold text-gray-800">Wisuda</h1>
         <a href="{{ route('graduation-events.create') }}"
-            class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
-            + Tambah Event
+            class="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                <path fill-rule="evenodd"
+                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+                    clip-rule="evenodd" />
+            </svg>
+            Tambah Event
         </a>
     </div>
 
@@ -31,17 +36,18 @@
                     </div>
                     <p class="text-sm text-gray-500 ml-11">{{ $event->sessions->count() }} sesi</p>
                 </a>
-                                <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-100">
+                <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-100">
                     <a href="{{ route('graduation-events.edit', $event) }}"
                         class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
-                         Edit
+                        Edit
                     </a>
                     <form method="POST" action="{{ route('graduation-events.destroy', $event) }}" class="inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" onclick="return confirm('Yakin hapus? Semua sesi & data di dalamnya ikut terhapus.')"
+                        <button type="submit"
+                            onclick="return confirm('Yakin hapus? Semua sesi & data di dalamnya ikut terhapus.')"
                             class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors">
-                             Hapus
+                            Hapus
                         </button>
                     </form>
                 </div>

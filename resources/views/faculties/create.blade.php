@@ -1,12 +1,7 @@
 @extends('dashboard')
 
 @section('content')
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-xl font-bold text-gray-800">Tambah Fakultas</h1>
-        <a href="{{ route('faculties.index') }}"
-            class="px-4 py-2 text-sm bg-sky-500 text-white rounded-lg font-medium hover:bg-sky-600 transition-colors">&lt;
-            Kembali</a>
-    </div>
+    <h1 class="text-xl font-bold text-gray-800 mb-6">Tambah Fakultas</h1>
 
     <div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white">
         <form method="POST" action="{{ route('faculties.store') }}" class="flex flex-col gap-4">
@@ -14,14 +9,14 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Kode : </label>
-                    <input type="text" name="code" value="{{ old('code') }}" placeholder="Masukkan Kode Fakultas"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 uppercase font-semibold"><br>
+                    <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Kode</label>
+                    <input type="text" name="code" value="{{ old('code') }}" placeholder="Contoh : FSAD"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 uppercase placeholder:normal-case font-semibold"><br>
                 </div>
 
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama : </label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan Nama Fakultas"
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Contoh: Fakultas Sains dan Analitika Data"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"><br>
                 </div>
             </div>
@@ -37,10 +32,22 @@
                 </div>
             </div>
 
-            <div class="pt-2">
+            <div class="flex justify-end gap-3 pt-2">
+                <a href="{{ route('faculties.index') }}"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                    Batal
+                </a>
                 <button type="submit"
-                    class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-medium text-sm rounded-lg shadow-sm transition-colors">
-                    >Simpan
+                    class="inline-flex items-center gap-1.5 px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white font-medium text-sm rounded-lg shadow-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    Simpan
                 </button>
             </div>
         </form>

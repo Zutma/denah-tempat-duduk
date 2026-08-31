@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Breadcrumb Level 2 -->
     <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
         <a href="{{ route('graduation-events.index') }}" class="hover:text-sky-600 transition-colors">Wisuda</a>
         <span class="text-gray-300">/</span>
@@ -18,12 +17,16 @@
             <h1 class="text-xl font-bold text-gray-800">
                 Data Wisudawan — Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
             </h1>
-            <p class="text-xs text-gray-500 mt-0.5">Daftar peserta wisuda beserta alokasi tempat duduk.</p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('sessions.graduates.create', $session) }}"
-                class="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
-                + Tambah Wisudawan
+                class="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd"
+                        d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+                        clip-rule="evenodd" />
+                </svg>
+                Tambah Wisudawan
             </a>
         </div>
     </div>

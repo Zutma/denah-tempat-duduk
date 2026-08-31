@@ -17,7 +17,6 @@
             <h1 class="text-xl font-bold text-gray-800">
                 Kelola Kursi — Sesi {{ \Carbon\Carbon::parse($session->date)->translatedFormat('d F Y') }}
             </h1>
-            <p class="text-xs text-gray-500 mt-0.5">Konfigurasi baris dan denah tempat duduk.</p>
         </div>
     </div>
 
@@ -50,7 +49,7 @@
             </div>
             <div>
                 <button type="submit" class="w-full px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
-                    + Tambah Baris
+                    Tambah Baris
                 </button>
             </div>
         </form>
