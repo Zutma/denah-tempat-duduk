@@ -63,7 +63,7 @@ class StudyProgramController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, StudyProgram $studyProgram)
-{
+    {
         $request->validate([
             'faculty_id' => 'required|exists:faculties,id',
             'name' => 'required|string',
@@ -81,6 +81,21 @@ class StudyProgramController extends Controller
     public function destroy(StudyProgram $studyProgram)
     {
         $studyProgram->delete();
-        return redirect()->route('study-programs.index');
+        return redirect()->route('study-programs.index')->with('success','Program Studi berhasil dihapus');
+    }
+
+    /**
+     * Hapus banyak data program studi sekaligus (Bulk Delete).
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:study_programs,id'
+        ]);
+
+        StudyProgram::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('study-programs.index')->with('success', count($request->ids) . ' program studi berhasil dihapus secara massal.');
     }
 }

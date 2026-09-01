@@ -6,9 +6,7 @@
         <a href="{{ route('graduation-events.create') }}"
             class="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
-                <path fill-rule="evenodd"
-                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-                    clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
             </svg>
             Tambah Event
         </a>
@@ -26,13 +24,37 @@
         </div>
     @endif
 
+    <!-- Form Tersembunyi untuk Bulk Delete -->
+    <form id="bulkDeleteForm" method="POST" action="{{ route('graduation-events.bulkDestroy') }}" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    @if($events->count() > 0)
+    <!-- Baris Aksi Massal untuk Layout Grid -->
+    <div class="mb-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+        <div class="flex items-center gap-2 px-2">
+            <input type="checkbox" id="selectAll" class="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer">
+            <label for="selectAll" class="text-sm font-medium text-gray-700 cursor-pointer">Pilih Semua</label>
+        </div>
+        <button type="button" onclick="submitBulkDelete()" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-md text-xs font-semibold hover:bg-red-100 hover:text-red-700 transition-colors">
+            Hapus Terpilih
+        </button>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($events as $event)
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+            <div class="relative bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                <!-- Checkbox Satuan di Pojok Kanan Atas Kartu -->
+                <div class="absolute top-4 right-4">
+                    <input type="checkbox" class="rowCheckbox w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer" value="{{ $event->id }}">
+                </div>
+
                 <a href="{{ route('graduation-events.sessions.index', $event) }}" class="block">
                     <div class="flex items-center gap-3 mb-1">
                         <span class="text-2xl">🏛️</span>
-                        <h3 class="font-semibold text-gray-900">{{ $event->name }}</h3>
+                        <h3 class="font-semibold text-gray-900 pr-6">{{ $event->name }}</h3>
                     </div>
                     <p class="text-sm text-gray-500 ml-11">{{ $event->sessions->count() }} sesi</p>
                 </a>
@@ -58,4 +80,42 @@
             </div>
         @endforelse
     </div>
+
+    <!-- Script Checkbox & Bulk Delete -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectAll = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+
+            if(selectAll) {
+                selectAll.addEventListener('change', function() {
+                    rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+                });
+
+                rowCheckboxes.forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        selectAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
+                    });
+                });
+            }
+        });
+
+        function submitBulkDelete() {
+            const checked = document.querySelectorAll('.rowCheckbox:checked');
+            if (checked.length === 0) {
+                alert('Pilih minimal satu event yang mau dihapus!');
+                return;
+            }
+
+            if (confirm(`Yakin mau hapus ${checked.length} event terpilih? (Semua sesi di dalamnya akan ikut terhapus)`)) {
+                const form = document.getElementById('bulkDeleteForm');
+                checked.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden'; input.name = 'ids[]'; input.value = cb.value;
+                    form.appendChild(input);
+                });
+                form.submit();
+            }
+        }
+    </script>
 @endsection

@@ -78,6 +78,21 @@ class FacultyController extends Controller
     public function destroy(Faculty $faculty)
     {
         $faculty->delete();
-        return redirect()->route('faculties.index')->with('success','Fakultas berhasil di update');
+        return redirect()->route('faculties.index')->with('success','Fakultas berhasil dihapus');
+    }
+
+    /**
+     * Hapus banyak data fakultas sekaligus (Bulk Delete).
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:faculties,id'
+        ]);
+
+        Faculty::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('faculties.index')->with('success', count($request->ids) . ' fakultas berhasil dihapus secara massal.');
     }
 }

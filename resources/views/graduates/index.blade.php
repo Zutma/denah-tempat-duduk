@@ -77,11 +77,29 @@
         </form>
     </div>
 
+    <!-- Form Tersembunyi untuk Bulk Delete -->
+    <form id="bulkDeleteForm" method="POST" action="{{ route('graduates.bulkDestroy') }}" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        
+        <!-- Header Aksi Massal -->
+        <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
+            <h3 class="text-sm font-semibold text-gray-800">Daftar Wisudawan</h3>
+            <button type="button" onclick="submitBulkDelete()" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-md text-xs font-semibold hover:bg-red-100 hover:text-red-700 transition-colors">
+                 Hapus Terpilih
+            </button>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-gray-900">
                 <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-semibold text-xs">
                     <tr>
+                        <th class="px-4 py-3 text-center w-10">
+                            <input type="checkbox" id="selectAll" class="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer">
+                        </th>
                         <th class="px-6 py-3 text-left">NRP</th>
                         <th class="px-6 py-3 text-left">Nama</th>
                         <th class="px-6 py-3 text-left">Fakultas</th>
@@ -97,6 +115,9 @@
                 <tbody class="divide-y divide-gray-200">
                     @forelse ($graduates as $graduate)
                         <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-4 text-center">
+                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer" value="{{ $graduate->id }}">
+                            </td>
                             <td class="px-6 py-4 font-mono text-xs font-semibold text-gray-800">{{ $graduate->nrp }}</td>
                             <td class="px-6 py-4 font-medium text-gray-900">{{ $graduate->name }}</td>
                             <td class="px-6 py-4">{{ $graduate->faculty->name ?? '-' }}</td>
@@ -133,7 +154,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-6 py-8 text-center text-gray-400">
+                            <td colspan="11" class="px-6 py-8 text-center text-gray-400">
                                 Belum ada data wisudawan untuk sesi ini.
                             </td>
                         </tr>
@@ -145,4 +166,44 @@
             {{ $graduates->links() }}
         </div>
     </div>
+
+    <!-- Script Checkbox & Bulk Delete -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectAll = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+
+            if(selectAll) {
+                selectAll.addEventListener('change', function() {
+                    rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+                });
+
+                rowCheckboxes.forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        selectAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
+                    });
+                });
+            }
+        });
+
+        function submitBulkDelete() {
+            const checked = document.querySelectorAll('.rowCheckbox:checked');
+            if (checked.length === 0) {
+                alert('Pilih minimal satu data wisudawan yang mau dihapus!');
+                return;
+            }
+
+            if (confirm(`Yakin mau hapus ${checked.length} data wisudawan yang dipilih?`)) {
+                const form = document.getElementById('bulkDeleteForm');
+                checked.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = cb.value;
+                    form.appendChild(input);
+                });
+                form.submit();
+            }
+        }
+    </script>
 @endsection

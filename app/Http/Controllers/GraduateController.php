@@ -100,4 +100,19 @@ class GraduateController extends Controller
         $graduate->delete();
         return redirect()->back()->with('success', 'Data wisudawan berhasil dihapus.');
     }
+
+    /**
+     * Hapus banyak data wisudawan sekaligus (Bulk Delete).
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:graduates,id'
+        ]);
+
+        Graduate::whereIn('id', $request->ids)->delete();
+
+        return redirect()->back()->with('success', count($request->ids) . ' data wisudawan berhasil dihapus secara massal.');
+    }
 }
