@@ -11,45 +11,65 @@ class PublicController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Ambil Sesi Wisuda yang statusnya Published
-        $activeSession = GraduationSession::where('status', 'published')->latest()->first();
+        // 1. Ambil semua sesi yang published
+        $publishedSessions = GraduationSession::with('event')
+            ->where('status', 'published')
+            ->latest()
+            ->get();
 
-        if (!$activeSession) {
-            return view('welcome', ['message' => 'Belum ada jadwal wisuda yang dipublikasikan.']);
-        }
+        // 2. Hanya set activeSession JIKA user sudah memilih di dropdown (ada session_id di URL)
+        $sessionId = $request->input('session_id');
+        $activeSession = $sessionId ? $publishedSessions->firstWhere('id', $sessionId) : null;
 
-        // 2. Logika Pencarian (Jika ada input nama/nrp)
         $searchQuery = $request->input('search');
         $myInfo = null;
         $mySeatId = null;
+        $leftRows = collect();
+        $rightRows = collect();
+        $message = null;
 
-        if ($searchQuery) {
-            $myInfo = Graduate::with(['seat', 'faculty', 'studyProgram'])
-                ->where('graduation_session_id', $activeSession->id)
-                ->where(function($query) use ($searchQuery) {
-                    $query->where('nrp', $searchQuery)
-                          ->orWhere('name', 'LIKE', "%{$searchQuery}%");
-                })->first();
+        // 3. Jika belum pilih sesi sama sekali
+        if (!$activeSession) {
+            $message = 'Silahkan pilih Acara Wisuda terlebih dahulu untuk melihat denah tempat duduk.';
+        } else {
+            // Logika pencarian mahasiswa...
+            if ($searchQuery) {
+                $myInfo = Graduate::with(['seat', 'faculty', 'studyProgram'])
+                    ->where('graduation_session_id', $activeSession->id)
+                    ->where(function($query) use ($searchQuery) {
+                        $query->where('nrp', $searchQuery)
+                            ->orWhere('name', 'LIKE', "%{$searchQuery}%");
+                    })->first();
 
-            if ($myInfo && $myInfo->seat) {
-                $mySeatId = $myInfo->seat->id;
+                if ($myInfo && $myInfo->seat) {
+                    $mySeatId = $myInfo->seat->id;
+                }
             }
+
+            // Ambil denah kursi untuk sesi yang dipilih...
+            $leftRows = SeatRow::with(['seats.graduate.faculty', 'seats.graduate.studyProgram'])
+                ->where('graduation_session_id', $activeSession->id)
+                ->where('side', 'left')
+                ->orderBy('row')
+                ->get();
+
+            $rightRows = SeatRow::with(['seats.graduate.faculty', 'seats.graduate.studyProgram'])
+                ->where('graduation_session_id', $activeSession->id)
+                ->where('side', 'right')
+                ->orderBy('row')
+                ->get();
         }
 
-        // 3. Ambil data baris kursi untuk Sayap Kiri dan Sayap Kanan
-        $leftRows = SeatRow::with(['seats.graduate.faculty'])
-            ->where('graduation_session_id', $activeSession->id)
-            ->where('side', 'left')
-            ->orderBy('row') // Urut A, B, C...
-            ->get();
-
-        $rightRows = SeatRow::with(['seats.graduate.faculty'])
-            ->where('graduation_session_id', $activeSession->id)
-            ->where('side', 'right')
-            ->orderBy('row')
-            ->get();
-
-        // 4. Kirim data ke tampilan welcome.blade.php
-        return view('welcome', compact('activeSession', 'leftRows', 'rightRows', 'searchQuery', 'myInfo', 'mySeatId'));
+        return view('welcome', compact(
+            'publishedSessions',
+            'activeSession', 
+            'leftRows', 
+            'rightRows', 
+            'searchQuery', 
+            'myInfo', 
+            'mySeatId',
+            'message'
+        ));
     }
+
 }
