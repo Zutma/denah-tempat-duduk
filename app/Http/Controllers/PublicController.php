@@ -17,36 +17,47 @@ class PublicController extends Controller
             ->latest()
             ->get();
 
-        // 2. Hanya set activeSession JIKA user sudah memilih di dropdown (ada session_id di URL)
+        // 2. Set activeSession jika user memilih dari dropdown
         $sessionId = $request->input('session_id');
         $activeSession = $sessionId ? $publishedSessions->firstWhere('id', $sessionId) : null;
 
         $searchQuery = $request->input('search');
-        $myInfo = null;
-        $mySeatId = null;
+        $searchResults = [];
         $leftRows = collect();
         $rightRows = collect();
         $message = null;
 
-        // 3. Jika belum pilih sesi sama sekali
+        // 3. Jika belum pilih sesi
         if (!$activeSession) {
             $message = 'Silahkan pilih Acara Wisuda terlebih dahulu untuk melihat denah tempat duduk.';
         } else {
-            // Logika pencarian mahasiswa...
+            // Logika pencarian wisudawan (Jamak / Multi Result)
             if ($searchQuery) {
-                $myInfo = Graduate::with(['seat', 'faculty', 'studyProgram'])
+                $graduates = Graduate::with(['seat.seatRow', 'faculty', 'studyProgram'])
                     ->where('graduation_session_id', $activeSession->id)
-                    ->where(function($query) use ($searchQuery) {
-                        $query->where('nrp', $searchQuery)
-                            ->orWhere('name', 'LIKE', "%{$searchQuery}%");
-                    })->first();
+                    ->where(function($q) use ($searchQuery) {
+                        $q->where('nrp', 'LIKE', "%{$searchQuery}%")
+                          ->orWhere('name', 'LIKE', "%{$searchQuery}%");
+                    })
+                    ->has('seat') // Memastikan wisudawan punya kursi
+                    ->get();
 
-                if ($myInfo && $myInfo->seat) {
-                    $mySeatId = $myInfo->seat->id;
+                foreach ($graduates as $g) {
+                    if ($g->seat && $g->seat->seatRow) {
+                        $searchResults[] = [
+                            'seat_id' => $g->seat->id,
+                            'seat_code' => $g->seat->seatRow->row . sprintf('%02d', $g->seat->number),
+                            'name' => $g->name,
+                            'nrp' => $g->nrp,
+                            'prodi' => $g->studyProgram->name ?? '-',
+                            'faculty' => $g->faculty->name ?? '-',
+                            'color' => $g->faculty->color ?? '#cbd5e1'
+                        ];
+                    }
                 }
             }
 
-            // Ambil denah kursi untuk sesi yang dipilih...
+            // Ambil denah kursi untuk sesi yang dipilih
             $leftRows = SeatRow::with(['seats.graduate.faculty', 'seats.graduate.studyProgram'])
                 ->where('graduation_session_id', $activeSession->id)
                 ->where('side', 'left')
@@ -66,10 +77,8 @@ class PublicController extends Controller
             'leftRows', 
             'rightRows', 
             'searchQuery', 
-            'myInfo', 
-            'mySeatId',
+            'searchResults',
             'message'
         ));
     }
-
 }
