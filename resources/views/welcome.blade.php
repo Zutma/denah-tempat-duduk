@@ -4,223 +4,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denah Kursi Wisuda - Interaktif</title>
+    <title>Denah Kursi Wisuda</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .seat-selected {
+            outline: 3px solid #0284c7;
+            outline-offset: 2px;
+        }
+
+        .scroll-x::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scroll-x::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 
-<body class="bg-slate-50 font-sans min-h-screen w-full flex flex-col items-center py-8">
+<body class="bg-slate-50 font-sans min-h-screen py-8" x-data="seatMapApp()">
 
-    <div class="w-full px-4 md:px-8 lg:px-12 text-center flex-grow flex flex-col">
+    <div class="max-w-4xl mx-auto px-4">
 
-        <!-- Header Title -->
-        <h1 class="text-xl md:text-2xl font-bold text-slate-800 mb-6">
+        <h1 class="text-xl md:text-2xl font-bold text-slate-800 text-center mb-6">
             @if ($activeSession && $activeSession->event)
-                {{ $activeSession->event->name }} - Sesi {{ $activeSession->session }}
+                {{ $activeSession->event->name }} — Sesi {{ $activeSession->session }}
             @else
                 Denah Wisuda
             @endif
         </h1>
 
-        <!-- Dropdown Pilihan Sesi / Event Wisuda -->
+        {{-- Pilih Sesi --}}
         @if (isset($publishedSessions) && $publishedSessions->count() > 0)
-            <div class="mb-6 max-w-md mx-auto w-full">
-                <form action="{{ route('public.home') }}" method="GET" id="sessionForm">
-                    {{-- <label for="session_id"
-                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                        Pilih Acara Wisuda:
-                    </label> --}}
-                    <span></span>
-                    <select name="session_id" id="session_id" onchange="document.getElementById('sessionForm').submit()"
-                        class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl shadow-sm text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-                        <!-- Option Default jika belum memilih -->
-                        <option value="" {{ !$activeSession ? 'selected' : '' }}>
-                            -- Pilih Acara Wisuda --
+            <form action="{{ route('public.home') }}" method="GET" class="mb-4">
+                <select name="session_id" onchange="this.form.submit()"
+                    class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700">
+                    <option value="" {{ !$activeSession ? 'selected' : '' }}>-- Pilih Acara Wisuda --</option>
+                    @foreach ($publishedSessions as $session)
+                        <option value="{{ $session->id }}"
+                            {{ $activeSession && $activeSession->id == $session->id ? 'selected' : '' }}>
+                            {{ $session->event->name ?? 'Event' }} — Sesi {{ $session->session }}
+                            ({{ \Carbon\Carbon::parse($session->date)->format('d M Y') }})
                         </option>
-
-                        @foreach ($publishedSessions as $session)
-                            <option value="{{ $session->id }}"
-                                {{ $activeSession && $activeSession->id == $session->id ? 'selected' : '' }}>
-                                {{ $session->event->name ?? 'Event' }} — Sesi {{ $session->session }}
-                                ({{ \Carbon\Carbon::parse($session->date)->format('d M Y') }})
-                            </option>
-                        @endforeach
-                    </select>
-
-                </form>
-            </div>
+                    @endforeach
+                </select>
+            </form>
         @endif
 
-        <!-- Informational Badge -->
-        {{-- @if ($activeSession && $activeSession->event)
-            <div
-                class="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-xs font-medium text-blue-700 mb-6 mx-auto">
-                <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                <span>Menampilkan Denah: <strong>{{ $activeSession->event->name }} (Sesi
-                        {{ $activeSession->session }})</strong></span>
-            </div>
-        @endif --}}
-
-
-        <!-- Search Bar -->
-        @if ($activeSession)
-            <div class="mb-10">
-                <form action="{{ route('public.home') }}" method="GET">
-                    <input type="hidden" name="session_id" value="{{ $activeSession->id }}">
-                    <input type="text" name="search" value="{{ $searchQuery ?? '' }}"
-                        placeholder="🔍 Masukkan Nama atau NRP, lalu Enter..."
-                        class="w-full max-w-lg px-5 py-3 border border-slate-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-center">
-                </form>
-                @if (!empty($searchQuery))
-                    <p class="text-xs text-slate-500 mt-2">
-                        Hasil pencarian untuk: <span class="font-bold text-slate-700">"{{ $searchQuery }}"</span>
-                        <a href="{{ route('public.home', ['session_id' => $activeSession->id]) }}"
-                            class="text-blue-600 underline ml-2">Reset</a>
-                    </p>
-                @endif
-            </div>
-        @endif
-
-        <!-- Tampilan Jika Sesi Kosong / Belum Ada Event -->
         @if (!$activeSession || isset($message))
-            <div
-                class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-6 py-4 rounded-xl max-w-md mx-auto my-12 shadow-sm">
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-lg text-sm text-center">
                 {{ $message ?? 'Belum ada data sesi wisuda yang tersedia.' }}
             </div>
         @else
-            <!-- Panggung Utama -->
+            {{-- Search Bar --}}
+            <form action="{{ route('public.home') }}" method="GET" class="mb-3">
+                <input type="hidden" name="session_id" value="{{ $activeSession->id }}">
+                <input type="text" name="search" value="{{ $searchQuery ?? '' }}"
+                    placeholder="Cari nama atau NRP, lalu tekan Enter..."
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm">
+            </form>
+
+            {{-- Hasil Pencarian: CARD INLINE, bukan dropdown melayang --}}
+            @if (!empty($searchQuery))
+                <div class="mb-6 bg-white border border-slate-200 rounded-lg shadow-sm p-3">
+                    <div class="flex items-center justify-between text-xs text-slate-500 px-1 mb-2">
+                        <span>Ditemukan <strong class="text-slate-800">{{ count($searchResults ?? []) }}</strong>
+                            hasil</span>
+                        <a href="{{ route('public.home', ['session_id' => $activeSession->id]) }}"
+                            class="text-sky-600 font-semibold hover:underline">Reset</a>
+                    </div>
+
+                    @if (isset($searchResults) && count($searchResults) > 0)
+                        <div class="divide-y divide-slate-100">
+                            @foreach ($searchResults as $result)
+                                <button type="button"
+                                    @click="pilihKursi({{ $result['seat_id'] }}, {{ json_encode($result) }})"
+                                    class="w-full p-2.5 hover:bg-sky-50 rounded-lg text-left flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-800">{{ $result['name'] }}</p>
+                                        <p class="text-xs text-slate-500">NRP: {{ $result['nrp'] }} —
+                                            {{ $result['prodi'] }}</p>
+                                    </div>
+                                    <span class="px-2.5 py-1 bg-sky-100 text-sky-700 text-xs font-bold rounded-lg">
+                                        Kursi {{ $result['seat_code'] }}
+                                    </span>
+                                </button>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-slate-500 px-1">Tidak ada hasil untuk "{{ $searchQuery }}".</p>
+                    @endif
+                </div>
+            @endif
+
+            {{-- Card Info Kursi Terpilih: bagian dari alur halaman, BUKAN modal --}}
+            <div x-show="dipilih" x-cloak class="mb-6 bg-white border-2 border-sky-200 rounded-lg shadow-sm p-4">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span
+                            class="inline-block px-2.5 py-1 bg-sky-100 text-sky-800 font-bold text-xs rounded-md mb-2">
+                            Kursi <span x-text="dipilih?.seat_code"></span>
+                        </span>
+                        <h4 class="text-base font-bold text-slate-800" x-text="dipilih?.name"></h4>
+                        <p class="text-xs text-slate-500" x-text="'NRP: ' + dipilih?.nrp"></p>
+                        <p class="text-xs text-slate-600 mt-1" x-text="dipilih?.prodi"></p>
+                        <p class="text-xs text-slate-500" x-text="dipilih?.faculty"></p>
+                    </div>
+                    <button @click="dipilih = null; seatIdTerpilih = null"
+                        class="text-slate-400 hover:text-slate-600 text-sm">✕</button>
+                </div>
+            </div>
+
+            {{-- Panggung --}}
             <div
-                class="bg-slate-800 text-white font-bold tracking-widest py-4 rounded-lg mb-8 shadow-md w-full max-w-6xl mx-auto">
+                class="bg-slate-800 text-white text-center font-bold tracking-widest py-4 rounded-lg mb-6 text-xs md:text-sm">
                 PANGGUNG UTAMA / REKTORAT
             </div>
 
-            <!-- Area Denah Kursi -->
-            <div id="denahContainer"
-                class="w-full overflow-x-auto pb-12 cursor-grab active:cursor-grabbing scroll-smooth">
-                <div class="flex flex-nowrap justify-center mx-auto min-w-max px-4 gap-6 md:gap-10">
+            {{-- Denah Kursi --}}
+            <div class="overflow-x-auto scroll-x pb-4">
+                <div class="flex justify-center gap-8 min-w-max px-2">
 
-                    <!-- SAYAP KIRI -->
-                    <div class="flex flex-col gap-6">
-                        @forelse($leftRows as $row)
+                    <div class="flex flex-col gap-4">
+                        @forelse ($leftRows as $row)
                             <div
-                                class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                <span class="font-bold text-slate-400 w-6 text-sm">{{ $row->row }}</span>
-                                <div class="grid grid-flow-col auto-cols-max gap-3">
+                                class="flex items-center gap-2 bg-white p-2.5 rounded-lg shadow-sm border border-slate-200">
+                                <span class="font-bold text-slate-400 w-5 text-sm">{{ $row->row }}</span>
+                                <div class="flex gap-2">
                                     @foreach ($row->seats as $seat)
-                                        @php
-                                            $graduate = $seat->graduate;
-                                            $facultyColor =
-                                                $graduate && $graduate->faculty && $graduate->faculty->color
-                                                    ? $graduate->faculty->color
-                                                    : '#cbd5e1';
-                                            $isMySeat = ($mySeatId ?? null) && $mySeatId == $seat->id;
-                                        @endphp
-
-                                        <div class="flex flex-col items-center group relative cursor-pointer">
-                                            <div class="w-12 h-12 md:w-14 md:h-14 rounded flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all
-                                                {{ $isMySeat ? 'ring-4 ring-blue-600 animate-bounce' : 'hover:-translate-y-1 hover:shadow-lg' }}"
-                                                style="background-color: {{ $graduate ? $facultyColor : '#e2e8f0' }}; color: {{ $graduate ? '#ffffff' : '#64748b' }};">
-                                                {{ $row->row }}{{ sprintf('%02d', $seat->number) }}
-                                            </div>
-
-                                            <span
-                                                class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
-                                                {{ $graduate ? explode(' ', trim($graduate->name))[0] : '-' }}
-                                            </span>
-
-                                            @if ($graduate)
-                                                <div
-                                                    class="absolute bottom-full mb-2 hidden group-hover:block bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-xl whitespace-nowrap z-10 text-left">
-                                                    <p class="font-bold text-yellow-300">{{ $graduate->name }}</p>
-                                                    <p class="text-slate-300">NRP: {{ $graduate->nrp }}</p>
-                                                    <p class="text-slate-300">Prodi:
-                                                        {{ $graduate->studyProgram->name ?? '-' }}</p>
-                                                    <p class="text-slate-300 font-semibold">Fakultas:
-                                                        {{ $graduate->faculty->name ?? '-' }}</p>
-                                                </div>
-                                            @endif
-                                        </div>
+                                        @include('public.seats._seat-button', [
+                                            'seat' => $seat,
+                                            'row' => $row,
+                                        ])
                                     @endforeach
                                 </div>
                             </div>
                         @empty
-                            <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kiri.</p>
+                            <p class="text-slate-400 text-sm italic">Belum ada kursi sayap kiri.</p>
                         @endforelse
                     </div>
 
-                    <!-- LORONG TENGAH -->
-                    <div class="flex items-stretch mx-2">
-                        <div
-                            class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
-                            <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs">
-                                LORONG
-                            </span>
-                        </div>
-                    </div>
+                    <div class="border-x-2 border-dashed border-slate-300"></div>
 
-                    <!-- SAYAP KANAN -->
-                    <div class="flex flex-col gap-6">
-                        @forelse($rightRows as $row)
+                    <div class="flex flex-col gap-4">
+                        @forelse ($rightRows as $row)
                             <div
-                                class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                <div class="grid grid-flow-col auto-cols-max gap-3">
+                                class="flex items-center gap-2 bg-white p-2.5 rounded-lg shadow-sm border border-slate-200">
+                                <div class="flex gap-2">
                                     @foreach ($row->seats as $seat)
-                                        @php
-                                            $graduate = $seat->graduate;
-                                            $facultyColor =
-                                                $graduate && $graduate->faculty && $graduate->faculty->color
-                                                    ? $graduate->faculty->color
-                                                    : '#cbd5e1';
-                                            $isMySeat = ($mySeatId ?? null) && $mySeatId == $seat->id;
-                                        @endphp
-
-                                        <div class="flex flex-col items-center group relative cursor-pointer">
-                                            <div class="w-12 h-12 md:w-14 md:h-14 rounded flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all
-                                                {{ $isMySeat ? 'ring-4 ring-blue-600 animate-bounce' : 'hover:-translate-y-1 hover:shadow-lg' }}"
-                                                style="background-color: {{ $graduate ? $facultyColor : '#e2e8f0' }}; color: {{ $graduate ? '#ffffff' : '#64748b' }};">
-                                                {{ $row->row }}{{ sprintf('%02d', $seat->number) }}
-                                            </div>
-
-                                            <span
-                                                class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
-                                                {{ $graduate ? explode(' ', trim($graduate->name))[0] : '-' }}
-                                            </span>
-
-                                            @if ($graduate)
-                                                <div
-                                                    class="absolute bottom-full mb-2 hidden group-hover:block bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-xl whitespace-nowrap z-10 text-left">
-                                                    <p class="font-bold text-yellow-300">{{ $graduate->name }}</p>
-                                                    <p class="text-slate-300">NRP: {{ $graduate->nrp }}</p>
-                                                    <p class="text-slate-300">Prodi:
-                                                        {{ $graduate->studyProgram->name ?? '-' }}</p>
-                                                    <p class="text-slate-300 font-semibold">Fakultas:
-                                                        {{ $graduate->faculty->name ?? '-' }}</p>
-                                                </div>
-                                            @endif
-                                        </div>
+                                        @include('public.seats._seat-button', [
+                                            'seat' => $seat,
+                                            'row' => $row,
+                                        ])
                                     @endforeach
                                 </div>
-                                <span class="font-bold text-slate-400 w-6 text-sm">{{ $row->row }}</span>
+                                <span class="font-bold text-slate-400 w-5 text-sm">{{ $row->row }}</span>
                             </div>
                         @empty
-                            <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kanan.</p>
+                            <p class="text-slate-400 text-sm italic">Belum ada kursi sayap kanan.</p>
                         @endforelse
                     </div>
 
                 </div>
             </div>
 
-        @endif
+            {{-- Legenda --}}
+            <div class="mt-6 flex justify-center gap-4 text-xs text-slate-500">
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-300 inline-block"></span>
+                    Kosong</div>
+                <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-500 inline-block"></span>
+                    Terisi (warna sesuai fakultas)</div>
+            </div>
 
+        @endif
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const container = document.getElementById('denahContainer');
-            if (container) {
-                container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+        function seatMapApp() {
+            return {
+                dipilih: null,
+                seatIdTerpilih: null,
+
+                pilihKursi(seatId, data) {
+                    this.seatIdTerpilih = seatId;
+                    this.dipilih = data;
+
+                    this.$nextTick(() => {
+                        const el = document.getElementById('seat-' + seatId);
+                        if (el) {
+                            el.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center',
+                                inline: 'center'
+                            });
+                        }
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                }
             }
-        });
+        }
     </script>
 </body>
 
