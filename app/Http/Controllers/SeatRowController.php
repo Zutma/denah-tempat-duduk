@@ -6,6 +6,7 @@ use App\Models\GraduationSession;
 use App\Models\Seat;
 use App\Models\SeatRow;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SeatRowController extends Controller
 {
@@ -39,40 +40,74 @@ class SeatRowController extends Controller
     public function store(Request $request, GraduationSession $session)
     {
         $request->validate([
-            'row'=>'required|string|max:1',
-            'side'=>'required|in:left,right',
-            'capacity'=>'required|integer|min:1|max:100'
+            'rows' => 'required|array|min:1',
+            'rows.*.row' => 'required|string|max:1',
+            'rows.*.left_capacity' => 'required|integer|min:0|max:100',
+            'rows.*.right_capacity' => 'required|integer|min:0|max:100',
         ]);
 
-        $row = strtoupper($request->row);
+        $createdCount = 0;
+        $skippedCount = 0;
 
-        $exists = SeatRow::where('graduation_session_id', $session->id)
-        ->where('row', $row)
-        ->where('side', $request->side)
-        ->exists();
+        DB::transaction(function () use ($request, $session, &$createdCount, &$skippedCount) {
+            foreach ($request->rows as $rowData) {
+                $rowName = strtoupper($rowData['row']);
+
+                // Process Sisi Kiri
+                if ($rowData['left_capacity'] > 0) {
+                    $this->createSeatRowWithSeats($session->id, $rowName, 'left', $rowData['left_capacity'], $createdCount, $skippedCount);
+                }
+
+                // Process Sisi Kanan
+                if ($rowData['right_capacity'] > 0) {
+                    $this->createSeatRowWithSeats($session->id, $rowName, 'right', $rowData['right_capacity'], $createdCount, $skippedCount);
+                }
+            }
+        });
+
+        $message = "Berhasil memproses baris kursi. ({$createdCount} sisi dibuat";
+        if ($skippedCount > 0) {
+            $message .= ", {$skippedCount} sisi dilewati karena sudah ada";
+        }
+        $message .= ").";
+
+        return redirect()->route('sessions.seats.index', $session)->with('success', $message);
+    }
+
+    private function createSeatRowWithSeats($sessionId, $row, $side, $capacity, &$createdCount, &$skippedCount)
+    {
+        $exists = SeatRow::where('graduation_session_id', $sessionId)
+            ->where('row', $row)
+            ->where('side', $side)
+            ->exists();
 
         if ($exists) {
-        return back()->withErrors(['row' => "Baris {$row} sisi {$request->side} sudah ada untuk sesi ini."])->withInput();
-         }
-
-        $seatRow = SeatRow::create([
-            'graduation_session_id'=>$session->id,
-            'row'=>$row,
-            'side'=>$request->side,
-            'index'=> 0,
-            'capacity'=>$request->capacity,
-        ]);
-
-        for ($i = 1;$i <= $request->capacity;$i++){
-            Seat::create([
-                'seat_row_id'=> $seatRow->id,
-                'position'=> $i,
-                'number'=>$i,
-                'category'=>'regular',
-            ]);
+            $skippedCount++;
+            return;
         }
 
-        return redirect()->route('sessions.seats.index', $session);
+        $seatRow = SeatRow::create([
+            'graduation_session_id' => $sessionId,
+            'row' => $row,
+            'side' => $side,
+            'index' => 0,
+            'capacity' => $capacity,
+        ]);
+
+        $seatsData = [];
+        for ($i = 1; $i <= $capacity; $i++) {
+            $seatsData[] = [
+                'seat_row_id' => $seatRow->id,
+                'position' => $i,
+                'number' => $i,
+                'category' => 'regular',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        Seat::insert($seatsData);
+        $createdCount++;
     }
 
     /**
