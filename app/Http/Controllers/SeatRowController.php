@@ -16,9 +16,13 @@ class SeatRowController extends Controller
     {
         $seatRows =SeatRow::where('graduation_session_id', $session->id)
             ->with('seats')
+            ->orderBy('row')
             ->get();
 
-        return view('seat-rows.index', compact('session', 'seatRows'));
+        $allLetters = range('A', 'Z');
+        $usedLetters = $seatRows->pluck('row')->toArray();
+
+        return view('seat-rows.index', compact('session', 'seatRows','allLetters','usedLetters'));
     }
 
     /**
