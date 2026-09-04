@@ -187,7 +187,7 @@
                         <div
                             class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
                             <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs">
-                                LORONG
+                                JALAN TENGAH
                             </span>
                         </div>
                     </div>

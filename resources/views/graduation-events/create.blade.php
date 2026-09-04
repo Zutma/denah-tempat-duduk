@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-xl font-bold text-gray-800 mb-6">Tambah Event Wisuda</h1>
+    <h1 class="text-xl font-bold text-gray-800 mb-6">Tambah Periode</h1>
 
     <div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white">
         <form method="POST" action="{{ route('graduation-events.store') }}" class="flex flex-col gap-4">
             @csrf
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Event</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Periode Wisuda</label>
                 <input type="text" name="name" value="{{ old('name') }}" placeholder="Contoh: Wisuda ke-133"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
             </div>
