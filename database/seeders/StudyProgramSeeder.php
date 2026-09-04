@@ -10,7 +10,7 @@ class StudyProgramSeeder extends Seeder
 {
     public function run(): void
     {
-        // Kumpulan data Prodi dari semua Fakultas (Gelar sudah dibersihkan)
+        // Kumpulan data Prodi dari semua Fakultas 
         $data = [
             // 1. FSAD (Fakultas Sains dan Analitika Data)
             ['faculty_id' => 1, 'name' => 'Fisika', 'degree_level' => 'S1'],
