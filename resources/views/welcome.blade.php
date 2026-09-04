@@ -22,6 +22,7 @@
         /* Custom Scrollbar Tipis */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
+            height: 6px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
@@ -123,126 +124,158 @@
         @else
             <!-- PANGGUNG UTAMA -->
             <div
-                class="bg-slate-800 text-white font-bold tracking-widest py-4 rounded-lg mb-8 shadow-md w-full max-w-6xl mx-auto text-xs md:text-sm">
+                class="bg-slate-800 text-white font-bold tracking-widest py-4 rounded-lg mb-6 shadow-md w-full max-w-6xl mx-auto text-xs md:text-sm">
                 PANGGUNG UTAMA / REKTORAT
             </div>
 
-            <!-- AREA DENAH KURSI -->
-            <div id="denahContainer"
-                class="w-full overflow-x-auto pb-16 cursor-grab active:cursor-grabbing scroll-smooth">
-                <div class="flex flex-nowrap justify-center mx-auto min-w-max px-4 gap-6 md:gap-10">
-
-                    <!-- SAYAP KIRI -->
-                    <div class="flex flex-col gap-6">
-                        @forelse($leftRows as $row)
-                            <div
-                                class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                <span class="font-bold text-slate-400 w-6 text-sm">{{ $row->row }}</span>
-                                <div class="grid grid-flow-col auto-cols-max gap-3">
-                                    @foreach ($row->seats as $seat)
-                                        @php
-                                            $graduate = $seat->graduate;
-                                            $facultyColor =
-                                                $graduate && $graduate->faculty && $graduate->faculty->color
-                                                    ? $graduate->faculty->color
-                                                    : '#cbd5e1';
-
-                                            $graduateData = $graduate
-                                                ? [
-                                                    'seat_id' => $seat->id,
-                                                    'seat_code' => $row->row . sprintf('%02d', $seat->number),
-                                                    'name' => $graduate->name,
-                                                    'nrp' => $graduate->nrp,
-                                                    'prodi' => $graduate->studyProgram->name ?? '-',
-                                                    'faculty' => $graduate->faculty->name ?? '-',
-                                                    'color' => $facultyColor,
-                                                ]
-                                                : null;
-                                        @endphp
-
-                                        <div class="flex flex-col items-center">
-                                            <button type="button" id="seat-{{ $seat->id }}"
-                                                @click="selectSeat({{ $seat->id }}, {{ json_encode($graduateData) }})"
-                                                :class="{ 'selected-seat-ring': selectedSeatId === {{ $seat->id }} }"
-                                                class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
-                                                style="background-color: {{ $graduate ? $facultyColor : '#e2e8f0' }}; color: {{ $graduate ? '#ffffff' : '#64748b' }};">
-                                                {{ $row->row }}{{ sprintf('%02d', $seat->number) }}
-                                            </button>
-
-                                            <span
-                                                class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
-                                                {{ $graduate ? explode(' ', trim($graduate->name))[0] : '-' }}
-                                            </span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kiri.</p>
-                        @endforelse
+            <!-- CONTAINER UTAMA DENAH -->
+            <div class="w-full max-w-6xl mx-auto relative">
+                
+                <!-- TOMBOL KONTROL ZOOM (HOLD TO ZOOM & RESET) -->
+                <div class="flex justify-end mb-3">
+                    <div class="inline-flex items-center bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden select-none">
+                        <button type="button" 
+                            onmousedown="window.startZoomHold(-0.05)" 
+                            onmouseup="window.stopZoomHold()" 
+                            onmouseleave="window.stopZoomHold()"
+                            ontouchstart="window.startZoomHold(-0.05)" 
+                            ontouchend="window.stopZoomHold()"
+                            class="px-3.5 py-1.5 text-slate-700 hover:bg-slate-100 font-bold text-sm transition focus:outline-none" title="Tahan untuk Zoom Out">-</button>
+                        
+                        <span id="zoomIndicator" class="px-3 py-1.5 text-xs font-bold text-slate-600 border-x border-slate-200 min-w-[50px] text-center">100%</span>
+                        
+                        <button type="button" 
+                            onmousedown="window.startZoomHold(0.05)" 
+                            onmouseup="window.stopZoomHold()" 
+                            onmouseleave="window.stopZoomHold()"
+                            ontouchstart="window.startZoomHold(0.05)" 
+                            ontouchend="window.stopZoomHold()"
+                            class="px-3.5 py-1.5 text-slate-700 hover:bg-slate-100 font-bold text-sm transition focus:outline-none" title="Tahan untuk Zoom In">+</button>
+                        
+                        <button type="button" onclick="window.resetZoom()" class="px-3.5 py-1.5 text-xs font-semibold text-sky-600 hover:bg-sky-50 border-l border-slate-200 transition focus:outline-none">Reset</button>
                     </div>
-
-                    <!-- LORONG TENGAH -->
-                    <div class="flex items-stretch mx-2">
-                        <div
-                            class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
-                            <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs">
-                                LORONG
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- SAYAP KANAN -->
-                    <div class="flex flex-col gap-6">
-                        @forelse($rightRows as $row)
-                            <div
-                                class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                <div class="grid grid-flow-col auto-cols-max gap-3">
-                                    @foreach ($row->seats as $seat)
-                                        @php
-                                            $graduate = $seat->graduate;
-                                            $facultyColor =
-                                                $graduate && $graduate->faculty && $graduate->faculty->color
-                                                    ? $graduate->faculty->color
-                                                    : '#cbd5e1';
-
-                                            $graduateData = $graduate
-                                                ? [
-                                                    'seat_id' => $seat->id,
-                                                    'seat_code' => $row->row . sprintf('%02d', $seat->number),
-                                                    'name' => $graduate->name,
-                                                    'nrp' => $graduate->nrp,
-                                                    'prodi' => $graduate->studyProgram->name ?? '-',
-                                                    'faculty' => $graduate->faculty->name ?? '-',
-                                                    'color' => $facultyColor,
-                                                ]
-                                                : null;
-                                        @endphp
-
-                                        <div class="flex flex-col items-center">
-                                            <button type="button" id="seat-{{ $seat->id }}"
-                                                @click="selectSeat({{ $seat->id }}, {{ json_encode($graduateData) }})"
-                                                :class="{ 'selected-seat-ring': selectedSeatId === {{ $seat->id }} }"
-                                                class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
-                                                style="background-color: {{ $graduate ? $facultyColor : '#e2e8f0' }}; color: {{ $graduate ? '#ffffff' : '#64748b' }};">
-                                                {{ $row->row }}{{ sprintf('%02d', $seat->number) }}
-                                            </button>
-
-                                            <span
-                                                class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
-                                                {{ $graduate ? explode(' ', trim($graduate->name))[0] : '-' }}
-                                            </span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                <span class="font-bold text-slate-400 w-6 text-sm">{{ $row->row }}</span>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kanan.</p>
-                        @endforelse
-                    </div>
-
                 </div>
+
+                <!-- AREA SCROLL HORIZONTAL -->
+                <div id="denahContainer"
+                    class="w-full overflow-x-auto pb-16 pt-2 cursor-grab active:cursor-grabbing scroll-smooth custom-scrollbar">
+                    
+                    <!-- KONTEN KURSI (URUTAN: SAYAP KIRI -> LORONG -> SAYAP KANAN) -->
+                    <div id="zoomContent" class="flex flex-nowrap justify-center mx-auto min-w-max px-4 gap-6 md:gap-10 transition-transform duration-75 origin-top">
+
+                        <!-- 1. SAYAP KIRI -->
+                        <div class="flex flex-col gap-6 items-end">
+                            @forelse($leftRows as $row)
+                                <div
+                                    class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                                    <span class="font-bold text-slate-400 w-6 text-sm text-center">{{ $row->row }}</span>
+                                    <div class="grid grid-flow-col auto-cols-max gap-3">
+                                        @foreach ($row->seats as $seat)
+                                            @php
+                                                $graduate = $seat->graduate;
+                                                $facultyColor =
+                                                    $graduate && $graduate->faculty && $graduate->faculty->color
+                                                        ? $graduate->faculty->color
+                                                        : '#cbd5e1';
+
+                                                $graduateData = $graduate
+                                                    ? [
+                                                        'seat_id' => $seat->id,
+                                                        'seat_code' => $row->row . sprintf('%02d', $seat->number),
+                                                        'name' => $graduate->name,
+                                                        'nrp' => $graduate->nrp,
+                                                        'prodi' => $graduate->studyProgram->name ?? '-',
+                                                        'faculty' => $graduate->faculty->name ?? '-',
+                                                        'color' => $facultyColor,
+                                                    ]
+                                                    : null;
+                                            @endphp
+
+                                            <div class="flex flex-col items-center">
+                                                <button type="button" id="seat-{{ $seat->id }}"
+                                                    @click="selectSeat({{ $seat->id }}, {{ json_encode($graduateData) }})"
+                                                    :class="{ 'selected-seat-ring': selectedSeatId === {{ $seat->id }} }"
+                                                    class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
+                                                    style="background-color: {{ $graduate ? $facultyColor : '#e2e8f0' }}; color: {{ $graduate ? '#ffffff' : '#64748b' }};">
+                                                    {{ $row->row }}{{ sprintf('%02d', $seat->number) }}
+                                                </button>
+
+                                                <span
+                                                    class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
+                                                    {{ $graduate ? explode(' ', trim($graduate->name))[0] : '-' }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kiri.</p>
+                            @endforelse
+                        </div>
+
+                        <!-- 2. LORONG TENGAH (PAS DI TENGAH) -->
+                        <div id="lorongTengah" class="flex items-stretch mx-2">
+                            <div
+                                class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
+                                <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs whitespace-nowrap">
+                                    LORONG
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 3. SAYAP KANAN -->
+                        <div class="flex flex-col gap-6 items-start">
+                            @forelse($rightRows as $row)
+                                <div
+                                    class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                                    <div class="grid grid-flow-col auto-cols-max gap-3">
+                                        @foreach ($row->seats as $seat)
+                                            @php
+                                                $graduate = $seat->graduate;
+                                                $facultyColor =
+                                                    $graduate && $graduate->faculty && $graduate->faculty->color
+                                                        ? $graduate->faculty->color
+                                                        : '#cbd5e1';
+
+                                                $graduateData = $graduate
+                                                    ? [
+                                                        'seat_id' => $seat->id,
+                                                        'seat_code' => $row->row . sprintf('%02d', $seat->number),
+                                                        'name' => $graduate->name,
+                                                        'nrp' => $graduate->nrp,
+                                                        'prodi' => $graduate->studyProgram->name ?? '-',
+                                                        'faculty' => $graduate->faculty->name ?? '-',
+                                                        'color' => $facultyColor,
+                                                    ]
+                                                    : null;
+                                            @endphp
+
+                                            <div class="flex flex-col items-center">
+                                                <button type="button" id="seat-{{ $seat->id }}"
+                                                    @click="selectSeat({{ $seat->id }}, {{ json_encode($graduateData) }})"
+                                                    :class="{ 'selected-seat-ring': selectedSeatId === {{ $seat->id }} }"
+                                                    class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
+                                                    style="background-color: {{ $graduate ? $facultyColor : '#e2e8f0' }}; color: {{ $graduate ? '#ffffff' : '#64748b' }};">
+                                                    {{ $row->row }}{{ sprintf('%02d', $seat->number) }}
+                                                </button>
+
+                                                <span
+                                                    class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
+                                                    {{ $graduate ? explode(' ', trim($graduate->name))[0] : '-' }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <span class="font-bold text-slate-400 w-6 text-sm text-center">{{ $row->row }}</span>
+                                </div>
+                            @empty
+                                <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kanan.</p>
+                            @endforelse
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
             <!-- MODAL DETAIL KURSI -->
@@ -295,7 +328,7 @@
 
     </div>
 
-    <!-- Script Alpine.js Manager -->
+    <!-- Script Alpine.js & Zoom Controller -->
     <script>
         function seatMapApp() {
             return {
@@ -304,8 +337,6 @@
 
                 selectSeat(seatId, data) {
                     if (!data) return;
-
-                    // Toggle: Jika diklik kursi yang sama, hilangkan border sorotan
                     if (this.selectedSeatId === seatId) {
                         this.selectedSeatId = null;
                         this.activeModalData = null;
@@ -333,7 +364,7 @@
 
                 closeModal() {
                     this.activeModalData = null;
-                    this.selectedSeatId = null; // Menghilangkan border biru saat modal ditutup
+                    this.selectedSeatId = null;
                 },
 
                 clearSelection() {
@@ -343,10 +374,81 @@
             }
         }
 
+        // ==========================================
+        // AUTO-CENTER TEPAT DI LORONG & HOLD-TO-ZOOM
+        // ==========================================
         document.addEventListener("DOMContentLoaded", function() {
             const container = document.getElementById('denahContainer');
+            const lorong = document.getElementById('lorongTengah');
+            
+            // Auto-center presisi langsung mengarahkan pandangan pas di tengah "LORONG"
+            function centerToLorong() {
+                if (container && lorong) {
+                    const containerWidth = container.clientWidth;
+                    const lorongLeft = lorong.offsetLeft;
+                    const lorongWidth = lorong.offsetWidth;
+                    
+                    // Hitung posisi scroll agar garis lorong tepat berada di tengah layar
+                    container.scrollLeft = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
+                }
+            }
+
+            setTimeout(centerToLorong, 50); // Eksekusi setelah elemen selesai dirender
+
+            let currentScale = 1;
+            const minScale = 0.4;
+            const maxScale = 1.8;
+            let holdInterval = null;
+
+            window.adjustZoom = function(amount) {
+                currentScale += amount;
+                if (currentScale > maxScale) currentScale = maxScale;
+                if (currentScale < minScale) currentScale = minScale;
+
+                applyZoom();
+            };
+
+            window.resetZoom = function() {
+                currentScale = 1;
+                applyZoom();
+                centerToLorong();
+            };
+
+            function applyZoom() {
+                const zoomContent = document.getElementById('zoomContent');
+                const zoomIndicator = document.getElementById('zoomIndicator');
+                
+                if (zoomContent) {
+                    zoomContent.style.transform = `scale(${currentScale})`;
+                }
+                if (zoomIndicator) {
+                    zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+                }
+            }
+
+            window.startZoomHold = function(amount) {
+                window.adjustZoom(amount);
+                holdInterval = setInterval(() => {
+                    window.adjustZoom(amount);
+                }, 100);
+            };
+
+            window.stopZoomHold = function() {
+                if (holdInterval) {
+                    clearInterval(holdInterval);
+                    holdInterval = null;
+                }
+            };
+
+            // Dukungan Ctrl + Scroll Mouse
             if (container) {
-                container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+                container.addEventListener('wheel', function(e) {
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        const zoomAmount = e.deltaY < 0 ? 0.08 : -0.08;
+                        window.adjustZoom(zoomAmount);
+                    }
+                }, { passive: false });
             }
         });
     </script>
